@@ -1,1 +1,59 @@
-[]
+[
+  {
+    "id": "4530b6db-fe99-4dbe-9491-b800d539bd31",
+    "type": "review",
+    "content_name": "베트남어_대출안내_카드뉴스_v1",
+    "language": "베트남어",
+    "input": {
+      "text": "Lãi suất vay chỉ từ 2.5%/năm, đảm bảo không thay đổi trong suốt thời hạn vay."
+    },
+    "result": {
+      "grade": "🟡 주의",
+      "violation_article": null,
+      "problem_expression": null,
+      "reason": "LLM 연동 전 stub 응답입니다.",
+      "suggestion": null
+    },
+    "status": "pending",
+    "manager_comment": "",
+    "created_at": "2026-05-30T22:09:02.343900"
+  },
+  {
+    "id": "3a5a8eda-8aaf-4d78-bec7-b5df1bec0d89",
+    "type": "review",
+    "content_name": "베트남어_대출안내_카드뉴스_v1",
+    "language": "베트남어",
+    "input": {
+      "text": "Lãi suất vay chỉ từ 2.5%/năm, đảm bảo không thay đổi trong suốt thời hạn vay."
+    },
+    "result": {
+      "grade": "🟡 주의",
+      "violation_article": null,
+      "problem_expression": null,
+      "reason": "LLM 연동 전 stub 응답입니다.",
+      "suggestion": null
+    },
+    "status": "pending",
+    "manager_comment": "",
+    "created_at": "2026-05-30T22:09:04.480827"
+  },
+  {
+    "id": "37a6a7a2-8787-48bc-a05f-36e464ee1d7b",
+    "type": "review",
+    "content_name": "베트남어_대출안내_카드뉴스_v1",
+    "language": "베트남어",
+    "input": {
+      "text": "Lãi suất vay chỉ từ 2.5%/năm, đảm bảo không thay đổi trong suốt thời hạn vay."
+    },
+    "result": {
+      "grade": "🟡 주의",
+      "violation_article": null,
+      "problem_expression": null,
+      "reason": "LLM 연동 전 stub 응답입니다.",
+      "suggestion": null
+    },
+    "status": "pending",
+    "manager_comment": "",
+    "created_at": "2026-05-30T22:09:05.058122"
+  }
+]

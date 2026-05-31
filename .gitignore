@@ -4,6 +4,9 @@
 ### dotenv ###
 .env
 
+### 프로젝트 ###
+backend/data/reviews.json
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
@@ -80,6 +83,7 @@ sketch
 [Ss]cripts
 pyvenv.cfg
 .venv
+venv
 pip-selfcheck.json
 
 ### VisualStudioCode ###
