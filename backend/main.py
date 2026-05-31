@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from review import router as review_router
-from compare import router as compare_router
+from analyze import router as analyze_router
 from approve import router as approve_router
 
 app = FastAPI(
@@ -13,8 +12,7 @@ app = FastAPI(
 ### 기능
 | 기능 | 엔드포인트 | 설명 |
 |------|-----------|------|
-| 기능 1 | `POST /api/review` | 외국어 텍스트 준법 심의 |
-| 기능 2 | `POST /api/compare` | 한국어 원문 vs 번역본 뉘앙스 비교 |
+| 기능 1+2 | `POST /api/analyze` | PDF 업로드 → 준법 심의 + 뉘앙스 비교 통합 분석 |
 | 기능 3 | `POST /api/approve/{id}` | 준법 관리자 승인 / 반려 |
 
 ### 판정 등급
@@ -33,8 +31,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(review_router, tags=["기능 1 — 준법 심의"])
-app.include_router(compare_router, tags=["기능 2 — 뉘앙스 비교"])
+app.include_router(analyze_router, tags=["기능 1+2 — 통합 분석"])
 app.include_router(approve_router, tags=["기능 3 — 승인/반려 & 이력"])
 
 
