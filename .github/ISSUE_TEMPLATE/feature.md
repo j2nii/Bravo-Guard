@@ -1,5 +1,5 @@
 ---
-name: 기능 구현
+name: 이슈 템플릿
 about: 새로운 기능 추가 또는 수정
 title: ""
 labels: ""
