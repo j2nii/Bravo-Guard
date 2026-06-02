@@ -5,42 +5,24 @@ from datetime import datetime
 from fastapi import APIRouter, File, Form, UploadFile
 
 from approve import save_record
+from llm import call_llm
 from pdf_parser import extract_text
+from prompts import COMPARE_SYSTEM_PROMPT, REVIEW_SYSTEM_PROMPT
 from schemas import ReviewRecord
-
-# A 파트 완성 후 아래 주석 해제
-# from llm import call_llm
-# from prompts import REVIEW_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT
 
 router = APIRouter()
 
 
 def _run_review(text: str, language: str, product_type: str) -> dict:
-    # TODO: A의 llm.py 완성 후 아래로 교체
-    # raw = call_llm(REVIEW_SYSTEM_PROMPT, f"[언어: {language}][상품유형: {product_type}]\n\n{text}")
-    # return json.loads(raw)
-    return {
-        "grade": "🟡 주의",
-        "violation_article": None,
-        "problem_expression": None,
-        "reason": "LLM 연동 전 stub 응답입니다.",
-        "suggestion": None,
-    }
+    user_message = f"[언어: {language}][상품유형: {product_type}]\n\n{text}"
+    raw = call_llm(REVIEW_SYSTEM_PROMPT, user_message)
+    return json.loads(raw)
 
 
 def _run_compare(original_ko: str, translated: str, language: str, product_type: str) -> dict:
-    # TODO: A의 llm.py 완성 후 아래로 교체
-    # raw = call_llm(COMPARE_SYSTEM_PROMPT, f"[언어: {language}][상품유형: {product_type}]\n원문:\n{original_ko}\n번역:\n{translated}")
-    # return json.loads(raw)
-    return {
-        "has_nuance_change": False,
-        "grade": "🟡 주의",
-        "violation_article": None,
-        "original_expression": None,
-        "translated_expression": None,
-        "reason": "LLM 연동 전 stub 응답입니다.",
-        "suggestion": None,
-    }
+    user_message = f"[언어: {language}][상품유형: {product_type}]\n원문:\n{original_ko}\n번역:\n{translated}"
+    raw = call_llm(COMPARE_SYSTEM_PROMPT, user_message)
+    return json.loads(raw)
 
 
 @router.post(
