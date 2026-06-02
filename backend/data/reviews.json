@@ -55,5 +55,37 @@
     "status": "pending",
     "manager_comment": "",
     "created_at": "2026-05-30T22:09:05.058122"
+  },
+  {
+    "id": "a3ca4bcc-36d7-447a-87a7-78ae3604b356",
+    "type": "compare",
+    "content_name": "string",
+    "language": "string",
+    "input": {
+      "product_type": "string",
+      "original_text": "시선을 사로잡는 서류전형 준비 대출\n취업 준비생을 위한 맞춤형 금융 솔루션\n[ 대출 상품 광고 ]\n상품 개요\n취업 시즌, 서류 준비에 드는 비용이 부담되시나요? \"서류전형 준비 대출\"은 이력서·포트폴리오 제작, 자격증\n응시료, 어학 시험 비용 등 취업 준비 전반을 지원하는 소액 신용 대출 상품입니다.\n핵심 대출 조건\n항목 내용\n대출 한도 최소 50만원 ~ 최대 300만원\n대출 금리 연 6.5% ~ 연 19.9% (신용등급에 따라 상이)\n대출 기간 최소 6개월 ~ 최대 36개월\n상환 방식 원리금 균등분할 상환\n신청 자격 만 19세 이상 대한민국 국적자 (재직·학생·구직자)\n필요 서류 신분증, 재직(재학)증명서 또는 구직확인서\n주요 혜택\n\u0000 당일 심사·당일 지급 신청 후 영업일 기준 당일 내 결과 통보 및 지급\n\u0000 중도상환 수수료 없음 언제든지 추가 비용 없이 조기 상환 가능\n\u0000 100% 비대면 신청 앱·웹에서 서류 제출부터 계약까지 온라인 완결\n\u0000 취업 성공 시 금리 우대 취업 확인 시 적용 금리에서 최대 1.5%p 인하\n상환 예시\n대출금액 100만원, 연 12%, 12개월 원리금균등 상환 시 → 월 납입액 약 88,849원, 총 상환액 약 1,066,189원\n(총 이자 약 66,189원)\n※ 금융상품 이용 전 반드시 상품설명서 및 약관을 확인하세요. ※ 대출 시 연체 이자율은 최대 연 20%이며, 연체 시 신용점수가 하락할 수\n있습니다. ※ 본 광고는 금융위원회 심의 기준에 따라 제작되었습니다. ※ 대출 한도 및 금리는 심사 결과에 따라 달라질 수 있습니다.\n금융회사명: (주)햇살론파트너스 | 허가번호: 2024-금융-00123 | 고객센터: 1588-0000",
+      "translated_text": "Vay Chuan bi Ho so Tuyen dung\nGiai phap tai chinh danh rieng cho nguoi tim viec\n[ QUANG CAO SAN PHAM VAY ]\nGioi thieu san pham\nBan dang can kinh phi chuan bi ho so xin viec? \"Vay Chuan bi Ho so Tuyen dung\" la san pham\ntin dung tieu dung ho tro toan bo chi phi lien quan den viec tim viec nhu: lam CV/portfolio, phi\nthi chung chi, phi thi ngoai ngu...\nDieu kien vay chinh\nHang muc Noi dung\nHan muc vay Tu 500.000 VND den 30.000.000 VND\nLai suat 6,5%/nam ~ 19,9%/nam (tuy xep hang tin dung)\nThoi han vay Tu 6 thang den 36 thang\nPhuong thuc tra no Tra goc + lai deu hang thang\nDieu kien Cong dan Viet Nam tu 19 tuoi tro len\nHo so can thiet CMND/CCCD, Giay xac nhan di lam/hoc/tim viec\nUu dai noi bat\nDuyet va giai ngan ngay Thong bao ket qua va giai ngan trong ngay lam viec\nKhong phi tra truoc han Tat toan bat cu luc nao ma khong ton them phi\n100% truc tuyen Nop ho so, ky hop dong hoan toan qua app/web\nUu dai lai suat khi co viec Giam toi da 1,5%/nam khi xac nhan co viec lam\nVi du tinh toan\nVay 10.000.000 VND, lai suat 12%/nam, ky han 12 thang, tra deu hang thang -> So tien tra\nhang thang khoang 888.490 VND, tong thanh toan khoang 10.661.880 VND (tong lai khoang\n661.880 VND)\nLuu y: Vui long doc ky dieu khoan va dieu kien truoc khi vay. Lai suat qua han toi da 20%/nam; no qua han anh\nhuong den diem tin dung. Quang cao nay duoc thuc hien theo quy dinh cua Uy ban Chung khoan Nha nuoc. Han muc\nva lai suat co the thay doi tuy theo ket qua tham dinh tin dung. Ten cong ty: Cong ty TNHH Tai chinh Hatsallon\nPartners | GPDKKD: 2024-TC-00123 | CSKH: 1588-0000"
+    },
+    "result": {
+      "review": {
+        "grade": "🟡 주의",
+        "violation_article": "금소법 제19조, 제21조",
+        "problem_expression": "Giam toi da 1,5%/nam khi xac nhan co viec lam, Duyet va giai ngan ngay, Thong bao ket qua va giai ngan trong ngay lam viec, So tien tra hang thang khoang 888.490 VND, tong thanh toan khoang 10.661.880 VND (tong lai khoang 661.880 VND)",
+        "reason": "1. 'Giam toi da 1,5%/nam' 등 확정적 표현 사용 가능성 (제21조) 2. 'Duyet va giai ngan ngay' 등 즉시성 강조로 소비자 기대감 유발 (제19조) 3. 총 상환금 계산 예시에서 총 이자액(661,880 VND)만 표기하고 연이자율(12%) 대비 실제 APR(연간실효율) 미제공 (제19조) 4. 'Uu dai' 등 표현에서 타 상품 대비 우월성 암시 가능성 (제21조) 5. 'Lai suat 6,5%~19,9%'로 범위만 표기하고 개인 신용도별 적용금리 구체적 설명 부재 (제19조)",
+        "suggestion": "1. 'Giam toi da' → 'Giam duoc den 1,5%'로 수정 2. 'Duyet va giai ngan ngay' → 'Duyet nhanh trong 1-3 ngay' 등 구체적 조건 추가 3. 총 상환금 계산 예시에 APR(연간실효율) 필수 표기 4. 'Uu dai' 표현 삭제 또는 타 상품 비교 시 객관적 근거 제시 5. 'Lai suat' 항목에 'Thuc te tu 6,5% den 19,9% tuong ung voi thang diem tin dung' 등 설명 추가"
+      },
+      "compare": {
+        "has_nuance_change": true,
+        "grade": "🟡 주의",
+        "violation_article": "금소법 제18조, 제19조, 제21조",
+        "original_expression": "취업 준비생을 위한 맞춤형 금융 솔루션, 서류 준비에 드는 비용이 부담되시나요?",
+        "translated_expression": "Giai phap tai chinh danh rieng cho nguoi tim viec, Ban dang can kinh phi chuan bi ho so xin viec?",
+        "reason": "1. 원문의 '맞춤형'이 번역본에서 'danh rieng'으로 번역되며 특정 고객군을 대상으로 하는 뉘앙스가 완화됨. 금소법 제18조(적정성원칙) 상 고객 특성 고려 의무 위반 가능성 있음. 2. '부담되시나요?'가 'can(필요하다)'로 번역되며 고객 상황 확인보다 상품 필요성 강조로 변화. 제19조(설명의무)상 고객 이해 확인 절차 약화 우려. 3. '취업 준비생' → 'nguoi tim viec(구직자)'로 대상 범위 확대. 제21조(부당권유금지)상 특정 조건 없는 광고로 오인 가능성 있음.",
+        "suggestion": "Giai phap tai chinh CHỈ dành cho nguoi tim viec dang chuan bi ho so - Ban co nhu can kinh phi cho ho so xin viec khong?"
+      }
+    },
+    "status": "pending",
+    "manager_comment": "",
+    "created_at": "2026-06-02T17:13:18.731403"
   }
 ]
