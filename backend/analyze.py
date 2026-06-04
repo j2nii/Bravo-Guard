@@ -1,4 +1,5 @@
 import json
+import os
 import uuid
 from datetime import datetime
 
@@ -9,6 +10,8 @@ from llm import call_llm
 from pdf_parser import extract_text
 from prompts import COMPARE_SYSTEM_PROMPT, REVIEW_SYSTEM_PROMPT
 from schemas import ReviewRecord
+
+PDF_DIR = os.path.join(os.path.dirname(__file__), "data", "pdfs")
 
 router = APIRouter()
 
@@ -44,8 +47,11 @@ async def analyze(
     original_pdf: UploadFile = File(..., description="한국어 원문 PDF"),
     translated_pdf: UploadFile = File(..., description="외국어 번역본 PDF"),
 ):
-    original_text = extract_text(await original_pdf.read())
-    translated_text = extract_text(await translated_pdf.read())
+    original_bytes = await original_pdf.read()
+    translated_bytes = await translated_pdf.read()
+
+    original_text = extract_text(original_bytes)
+    translated_text = extract_text(translated_bytes)
 
     review_result = _run_review(translated_text, language, product_type)
     compare_result = _run_compare(original_text, translated_text, language, product_type)
@@ -66,5 +72,10 @@ async def analyze(
         },
         created_at=datetime.now().isoformat(),
     )
+    # 원문 PDF 저장 (다운로드 옵션용)
+    pdf_path = os.path.join(PDF_DIR, f"{record.id}_original.pdf")
+    with open(pdf_path, "wb") as f:
+        f.write(original_bytes)
+
     save_record(record.model_dump())
     return record
