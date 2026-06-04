@@ -58,10 +58,24 @@ def get_stats():
 @router.get(
     "/api/reviews",
     summary="전체 심의 이력 조회",
-    description="저장된 모든 심의 이력을 최신순으로 반환합니다. 준법 관리자 대시보드에서 사용합니다.",
+    description="""
+저장된 심의 이력을 최신순으로 반환합니다.
+
+**status 필터 (선택)**
+- `pending`: 검토 대기
+- `approved`: 승인
+- `rejected`: 반려
+- `revision_requested`: 수정 요청
+- `violation`: 위반 포함 (result.review.grade == 🔴 위반)
+    """,
 )
-def list_reviews():
-    return sorted(_load(), key=lambda r: r["created_at"], reverse=True)
+def list_reviews(status: str | None = None):
+    records = sorted(_load(), key=lambda r: r["created_at"], reverse=True)
+    if status is None:
+        return records
+    if status == "violation":
+        return [r for r in records if r.get("result", {}).get("review", {}).get("grade") == "🔴 위반"]
+    return [r for r in records if r["status"] == status]
 
 
 @router.get(
