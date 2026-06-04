@@ -32,6 +32,30 @@ def save_record(record: dict) -> None:
 # --- 엔드포인트 ---
 
 @router.get(
+    "/api/stats",
+    summary="승인 관리 통계 조회",
+    description="""
+승인 관리 화면 상단 통계 카드 4개에 필요한 카운트를 반환합니다.
+
+| 항목 | 기준 |
+|------|------|
+| 전체 심의 건 | 전체 records 수 |
+| 검토 대기 | status == pending |
+| 위반 포함 | result.review.grade == 🔴 위반 |
+| 최종 승인 | status == approved |
+    """,
+)
+def get_stats():
+    records = _load()
+    return {
+        "total": len(records),
+        "pending": sum(1 for r in records if r["status"] == "pending"),
+        "violation": sum(1 for r in records if r.get("result", {}).get("review", {}).get("grade") == "🔴 위반"),
+        "approved": sum(1 for r in records if r["status"] == "approved"),
+    }
+
+
+@router.get(
     "/api/reviews",
     summary="전체 심의 이력 조회",
     description="저장된 모든 심의 이력을 최신순으로 반환합니다. 준법 관리자 대시보드에서 사용합니다.",
