@@ -1,8 +1,13 @@
 import json
 import os
+from urllib.parse import quote
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse, Response
+from report_generator import generate_report_pdf
 from schemas import ApproveRequest, ReviewRecord
+
+PDF_DIR = os.path.join(os.path.dirname(__file__), "data", "pdfs")
 
 router = APIRouter()
 
@@ -111,3 +116,43 @@ def approve(review_id: str, req: ApproveRequest):
             _save(records)
             return r
     raise HTTPException(status_code=404, detail="심의 이력을 찾을 수 없습니다.")
+
+
+@router.get(
+    "/api/reports/{review_id}/download",
+    summary="심의 리포트 다운로드",
+    description="""
+심의 결과를 다운로드합니다.
+
+**type 파라미터**
+- `full` (기본값): 전체 문구 포함 — 전체 리포트 (JSON)
+- `summary`: 위반(🔴) 항목만 포함 — 요약 리포트 (JSON)
+- `original_pdf`: 한국어 원문 PDF 파일 반환
+    """,
+)
+def download_report(review_id: str, type: str = "full"):
+    record = next((r for r in _load() if r["id"] == review_id), None)
+    if not record:
+        raise HTTPException(status_code=404, detail="심의 이력을 찾을 수 없습니다.")
+
+    # 원문 PDF 반환
+    if type == "original_pdf":
+        pdf_path = os.path.join(PDF_DIR, f"{review_id}_original.pdf")
+        if not os.path.exists(pdf_path):
+            raise HTTPException(status_code=404, detail="원문 PDF 파일을 찾을 수 없습니다.")
+        filename = f"original_{record['content_name']}_{record['created_at'][:10]}.pdf"
+        encoded_filename = quote(filename)
+        return FileResponse(
+            path=pdf_path,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"},
+        )
+
+    pdf_bytes = generate_report_pdf(record, report_type=type)
+    filename = f"report_{record['content_name']}_{record['created_at'][:10]}_{type}.pdf"
+    encoded_filename = quote(filename)
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"},
+    )
