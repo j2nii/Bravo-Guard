@@ -55,7 +55,7 @@ def get_stats():
     return {
         "total": len(records),
         "pending": sum(1 for r in records if r["status"] == "pending"),
-        "violation": sum(1 for r in records if r.get("result", {}).get("review", {}).get("grade") == "🔴 위반"),
+        "violation": sum(1 for r in records if r.get("result", {}).get("review", {}).get("overall_grade") == "🔴 위반"),
         "approved": sum(1 for r in records if r["status"] == "approved"),
     }
 
@@ -79,7 +79,7 @@ def list_reviews(status: str | None = None):
     if status is None:
         return records
     if status == "violation":
-        return [r for r in records if r.get("result", {}).get("review", {}).get("grade") == "🔴 위반"]
+        return [r for r in records if r.get("result", {}).get("review", {}).get("overall_grade") == "🔴 위반"]
     return [r for r in records if r["status"] == status]
 
 
