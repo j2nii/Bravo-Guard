@@ -345,7 +345,7 @@ export function ReviewStep({ meta, result, reviewId, onNext }: ReviewStepProps) 
           <Button
             variant="default"
             className="bg-emerald-600 hover:bg-emerald-700"
-            disabled={!!approveStatus}
+            disabled={false}
             onClick={() => handleApprove("approved")}
           >
             승인
@@ -353,14 +353,14 @@ export function ReviewStep({ meta, result, reviewId, onNext }: ReviewStepProps) 
           <Button
             variant="outline"
             className="border-red-200 text-red-700 hover:bg-red-50"
-            disabled={!!approveStatus}
+            disabled={false}
             onClick={() => handleApprove("rejected")}
           >
             반려
           </Button>
           <Button
             variant="outline"
-            disabled={!!approveStatus}
+            disabled={false}
             onClick={() => handleApprove("revision_requested")}
           >
             수정 요청

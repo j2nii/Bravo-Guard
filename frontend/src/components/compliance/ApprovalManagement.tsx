@@ -282,7 +282,7 @@ export function ApprovalManagement() {
                                     <Button
                                       size="sm"
                                       className="gap-2 bg-emerald-600 hover:bg-emerald-700"
-                                      disabled={r.status !== "pending" || !!actionLoading}
+                                      disabled={!!actionLoading}
                                       onClick={() => handleApprove(r.id, "approved")}
                                     >
                                       <CheckCircle2 className="h-4 w-4" />
@@ -292,7 +292,7 @@ export function ApprovalManagement() {
                                       size="sm"
                                       variant="outline"
                                       className="border-red-200 text-red-700 hover:bg-red-50"
-                                      disabled={r.status !== "pending" || !!actionLoading}
+                                      disabled={!!actionLoading}
                                       onClick={() => handleApprove(r.id, "rejected")}
                                     >
                                       반려
@@ -300,7 +300,7 @@ export function ApprovalManagement() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      disabled={r.status !== "pending" || !!actionLoading}
+                                      disabled={!!actionLoading}
                                       onClick={() => handleApprove(r.id, "revision_requested")}
                                     >
                                       수정 요청
