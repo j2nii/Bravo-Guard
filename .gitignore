@@ -79,6 +79,7 @@ sketch
 [Ii]nclude
 [Ll]ib
 [Ll]ib64
+!frontend/src/lib/
 [Ll]ocal
 [Ss]cripts
 pyvenv.cfg
