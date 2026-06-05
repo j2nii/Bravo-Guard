@@ -756,8 +756,8 @@
         }
       }
     },
-    "status": "pending",
-    "manager_comment": "",
+    "status": "approved",
+    "manager_comment": "금소법 제22조 위반 소지 있음. 우대금리 조건 명시 후 재심의 요청.",
     "created_at": "2026-06-05T13:14:01.632122"
   }
 ]
