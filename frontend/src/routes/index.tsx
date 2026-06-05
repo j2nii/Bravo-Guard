@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Sparkles, ShieldCheck } from "lucide-react";
+import { Loader2, Sparkles, ShieldCheck } from "lucide-react";
 import { Stepper } from "@/components/compliance/Stepper";
 import { PdfDropzone } from "@/components/compliance/PdfDropzone";
 import { ReviewStep } from "@/components/compliance/ReviewStep";
 import { ReportStep } from "@/components/compliance/ReportStep";
 import { ApprovalManagement } from "@/components/compliance/ApprovalManagement";
 import { cn } from "@/lib/utils";
+import { analyzeDocuments } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -66,9 +67,35 @@ function Index() {
   const [productType, setProductType] = useState<string>("");
   const [koreanFile, setKoreanFile] = useState<File | null>(null);
   const [foreignFile, setForeignFile] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [analyzeResult, setAnalyzeResult] = useState<Record<string, unknown> | null>(null);
+  const [reviewId, setReviewId] = useState<string | null>(null);
 
   const canStart =
     !!koreanFile && !!foreignFile && !!productName && !!language && !!productType;
+
+  async function handleAnalyze() {
+    if (!koreanFile || !foreignFile) return;
+    setIsLoading(true);
+    setErrorMsg(null);
+    try {
+      const result = await analyzeDocuments({
+        contentName: productName,
+        language: LANGUAGE_LABEL[language] ?? language,
+        productType: PRODUCT_TYPE_LABEL[productType] ?? productType,
+        originalPdf: koreanFile,
+        translatedPdf: foreignFile,
+      });
+      setAnalyzeResult(result);
+      setReviewId(result.id);
+      setStep(2);
+    } catch (e) {
+      setErrorMsg(e instanceof Error ? e.message : "분석 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
@@ -189,15 +216,30 @@ function Index() {
                 </p>
               </div>
 
+              {errorMsg && (
+                <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {errorMsg}
+                </p>
+              )}
+
               <div className="mt-8 flex justify-end">
                 <Button
                   size="lg"
-                  disabled={!canStart}
-                  onClick={() => setStep(2)}
+                  disabled={!canStart || isLoading}
+                  onClick={handleAnalyze}
                   className="gap-2"
                 >
-                  <Sparkles className="h-4 w-4" />
-                  AI 분석 시작
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      AI 분석 중...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4" />
+                      AI 분석 시작
+                    </>
+                  )}
                 </Button>
               </div>
               </div>
@@ -212,6 +254,8 @@ function Index() {
                   koreanFileName: koreanFile?.name ?? "한국어 원문.pdf",
                   foreignFileName: foreignFile?.name ?? "번역본.pdf",
                 }}
+                result={analyzeResult}
+                reviewId={reviewId}
                 onNext={() => setStep(3)}
               />
             )}
@@ -223,6 +267,7 @@ function Index() {
                   language: LANGUAGE_LABEL[language] ?? language,
                   productType: PRODUCT_TYPE_LABEL[productType] ?? productType,
                 }}
+                reviewId={reviewId}
                 onRestart={() => {
                   setStep(1);
                   setProductName("");
@@ -230,6 +275,8 @@ function Index() {
                   setProductType("");
                   setKoreanFile(null);
                   setForeignFile(null);
+                  setAnalyzeResult(null);
+                  setReviewId(null);
                 }}
               />
             )}

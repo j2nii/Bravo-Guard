@@ -25,7 +25,23 @@ def _parse_llm_json(raw: str) -> dict:
     # ```json ... ``` 또는 ``` ... ``` 형태 제거
     cleaned = re.sub(r"^```(?:json)?\s*", "", raw.strip())
     cleaned = re.sub(r"\s*```$", "", cleaned)
-    return json.loads(cleaned.strip())
+    cleaned = cleaned.strip()
+
+    # 1차 시도: 그대로 파싱
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # 2차 시도: 중괄호 기준으로 JSON 블록만 추출
+    match = re.search(r"\{[\s\S]*\}", cleaned)
+    if match:
+        try:
+            return json.loads(match.group())
+        except json.JSONDecodeError:
+            pass
+
+    raise ValueError(f"LLM 응답을 JSON으로 파싱할 수 없습니다: {cleaned[:200]}")
 
 
 # --- 문구 분리 ---
@@ -85,8 +101,21 @@ def _run_review(clauses: list[str], language: str, product_type: str) -> dict:
     items = []
     for i, clause in enumerate(clauses):
         msg = _build_review_message(clause, i, clauses, language, product_type)
-        raw = call_llm(REVIEW_SYSTEM_PROMPT, msg)
-        items.append(_parse_llm_json(raw))
+        try:
+            raw = call_llm(REVIEW_SYSTEM_PROMPT, msg)
+            items.append(_parse_llm_json(raw))
+        except Exception as e:
+            # 파싱 실패 시 주의 등급으로 대체
+            items.append({
+                "index": i + 1,
+                "title": "분석 오류",
+                "grade": "🟡 주의",
+                "severity": "warning",
+                "violation_article": None,
+                "problem_expression": None,
+                "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
+                "suggestion": None,
+            })
 
     grades = [item["grade"] for item in items]
     overall_grade = min(grades, key=_grade_order) if grades else "🟢 통과"
@@ -109,8 +138,24 @@ def _run_compare(ko_clauses: list[str], tr_clauses: list[str], language: str, pr
     items = []
     for i in range(count):
         msg = _build_compare_message(ko_clauses[i], tr_clauses[i], i, ko_clauses, tr_clauses, language, product_type)
-        raw = call_llm(COMPARE_SYSTEM_PROMPT, msg)
-        items.append(_parse_llm_json(raw))
+        try:
+            raw = call_llm(COMPARE_SYSTEM_PROMPT, msg)
+            items.append(_parse_llm_json(raw))
+        except Exception as e:
+            items.append({
+                "index": i + 1,
+                "title": "분석 오류",
+                "has_nuance_change": False,
+                "grade": "🟡 주의",
+                "severity": "warning",
+                "violation_article": None,
+                "original": ko_clauses[i],
+                "translated": tr_clauses[i],
+                "original_expression": None,
+                "translated_expression": None,
+                "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
+                "suggestion": None,
+            })
 
     grades = [item["grade"] for item in items]
     overall_grade = min(grades, key=_grade_order) if grades else "🟢 통과"

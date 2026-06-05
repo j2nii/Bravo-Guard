@@ -15,11 +15,48 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-  MOCK_CLAUSES,
-  type ReviewClause,
-  type Severity,
-} from "./reviewData";
+import { approveReview } from "@/lib/api";
+import type { ReviewClause, Severity } from "./reviewData";
+
+// API 응답의 compare.items 항목을 ReviewClause 형태로 변환
+function toHighlightParts(
+  text: string,
+  expression: string | null,
+): ReviewClause["original"] {
+  if (!expression || !text.includes(expression)) {
+    return [{ text }];
+  }
+  const idx = text.indexOf(expression);
+  const parts: ReviewClause["original"] = [];
+  if (idx > 0) parts.push({ text: text.slice(0, idx) });
+  parts.push({ text: expression, highlight: true });
+  if (idx + expression.length < text.length)
+    parts.push({ text: text.slice(idx + expression.length) });
+  return parts;
+}
+
+function mapApiResultToClauses(result: Record<string, unknown>): ReviewClause[] {
+  const compare = result.result as Record<string, unknown> | undefined;
+  const items = (compare?.compare as Record<string, unknown>)?.items as Record<string, unknown>[] | undefined;
+  if (!items) return [];
+
+  return items.map((item) => ({
+    id: item.index as number,
+    title: (item.title as string) ?? "",
+    severity: (item.severity as Severity) ?? "compliant",
+    law: (item.violation_article as string) ?? undefined,
+    original: toHighlightParts(
+      (item.original as string) ?? "",
+      (item.original_expression as string) ?? null,
+    ),
+    translation: toHighlightParts(
+      (item.translated as string) ?? "",
+      (item.translated_expression as string) ?? null,
+    ),
+    reasoning: (item.reason as string) ?? undefined,
+    suggestion: (item.suggestion as string) ?? undefined,
+  }));
+}
 
 interface ReviewStepProps {
   meta: {
@@ -29,6 +66,8 @@ interface ReviewStepProps {
     koreanFileName: string;
     foreignFileName: string;
   };
+  result: Record<string, unknown> | null;
+  reviewId: string | null;
   onNext: () => void;
 }
 
@@ -90,19 +129,35 @@ function HighlightedText({
   );
 }
 
-export function ReviewStep({ meta, onNext }: ReviewStepProps) {
+export function ReviewStep({ meta, result, reviewId, onNext }: ReviewStepProps) {
   const [filter, setFilter] = useState<Filter>("all");
+  const [approveStatus, setApproveStatus] = useState<string | null>(null);
+
+  const clauses = useMemo(
+    () => (result ? mapApiResultToClauses(result) : []),
+    [result],
+  );
 
   const counts = useMemo(() => {
-    const total = MOCK_CLAUSES.length;
-    const violation = MOCK_CLAUSES.filter((c) => c.severity === "violation").length;
-    const warning = MOCK_CLAUSES.filter((c) => c.severity === "warning").length;
-    const compliant = MOCK_CLAUSES.filter((c) => c.severity === "compliant").length;
+    const total = clauses.length;
+    const violation = clauses.filter((c) => c.severity === "violation").length;
+    const warning = clauses.filter((c) => c.severity === "warning").length;
+    const compliant = clauses.filter((c) => c.severity === "compliant").length;
     return { total, violation, warning, compliant };
-  }, []);
+  }, [clauses]);
 
   const filtered =
-    filter === "all" ? MOCK_CLAUSES : MOCK_CLAUSES.filter((c) => c.severity === filter);
+    filter === "all" ? clauses : clauses.filter((c) => c.severity === filter);
+
+  async function handleApprove(action: "approved" | "rejected" | "revision_requested") {
+    if (!reviewId) return;
+    try {
+      await approveReview(reviewId, action);
+      setApproveStatus(action);
+    } catch {
+      alert("처리 중 오류가 발생했습니다.");
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -286,14 +341,39 @@ export function ReviewStep({ meta, onNext }: ReviewStepProps) {
 
       {/* Footer actions */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-sm">
-        <div className="flex flex-wrap gap-2">
-          <Button variant="default" className="bg-emerald-600 hover:bg-emerald-700">
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="default"
+            className="bg-emerald-600 hover:bg-emerald-700"
+            disabled={false}
+            onClick={() => handleApprove("approved")}
+          >
             승인
           </Button>
-          <Button variant="outline" className="border-red-200 text-red-700 hover:bg-red-50">
+          <Button
+            variant="outline"
+            className="border-red-200 text-red-700 hover:bg-red-50"
+            disabled={false}
+            onClick={() => handleApprove("rejected")}
+          >
             반려
           </Button>
-          <Button variant="outline">수정 요청</Button>
+          <Button
+            variant="outline"
+            disabled={false}
+            onClick={() => handleApprove("revision_requested")}
+          >
+            수정 요청
+          </Button>
+          {approveStatus && (
+            <span className="text-sm text-muted-foreground">
+              {{
+                approved: "✅ 승인 완료",
+                rejected: "❌ 반려 완료",
+                revision_requested: "🔄 수정 요청 완료",
+              }[approveStatus]}
+            </span>
+          )}
         </div>
         <Button onClick={onNext} className="gap-2">
           리포트 생성

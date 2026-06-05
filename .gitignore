@@ -6,6 +6,7 @@
 
 ### 프로젝트 ###
 backend/data/reviews.json
+backend/data/pdfs/*.pdf
 
 ### Git ###
 # Created by git for backups. To disable backups in Git:
@@ -79,6 +80,7 @@ sketch
 [Ii]nclude
 [Ll]ib
 [Ll]ib64
+!frontend/src/lib/
 [Ll]ocal
 [Ss]cripts
 pyvenv.cfg
