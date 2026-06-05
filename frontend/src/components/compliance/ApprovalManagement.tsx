@@ -317,16 +317,6 @@ export function ApprovalManagement() {
                                       <Download className="h-4 w-4" />
                                       요약 리포트
                                     </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="gap-2"
-                                      onClick={() => handleDownload(r.id, "original_pdf")}
-                                      disabled={!!dlLoading}
-                                    >
-                                      <Download className="h-4 w-4" />
-                                      원문 PDF
-                                    </Button>
                                   </div>
                                 </div>
                               </div>
