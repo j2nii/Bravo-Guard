@@ -20,7 +20,10 @@ def _load() -> list:
     if not os.path.exists(DATA_PATH):
         return []
     with open(DATA_PATH, "r", encoding="utf-8") as f:
-        return json.load(f)
+        content = f.read().strip()
+        if not content:
+            return []
+        return json.loads(content)
 
 
 def _save(records: list) -> None:
