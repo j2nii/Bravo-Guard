@@ -2,12 +2,12 @@ import {
   CheckCircle2,
   Download,
   FileText,
+  Loader2,
   RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { downloadReport } from "@/lib/api";
 
 interface ReportStepProps {
   meta: {
@@ -15,6 +15,7 @@ interface ReportStepProps {
     language: string;
     productType: string;
   };
+  reviewId: string | null;
   onRestart: () => void;
 }
 
@@ -26,16 +27,26 @@ const REPORT_SECTIONS = [
   "준법 자문가 서명란",
 ];
 
-export function ReportStep({ meta, onRestart }: ReportStepProps) {
-  const [violationsOnly, setViolationsOnly] = useState(false);
-  const [fullReport, setFullReport] = useState(true);
-  const [includeOriginal, setIncludeOriginal] = useState(false);
+export function ReportStep({ meta, reviewId, onRestart }: ReportStepProps) {
+  const [loading, setLoading] = useState<string | null>(null);
 
   const today = new Date().toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+  async function handleDownload(type: "full" | "summary" | "original_pdf") {
+    if (!reviewId) return;
+    setLoading(type);
+    try {
+      await downloadReport(reviewId, type);
+    } catch {
+      alert("다운로드 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(null);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -76,75 +87,52 @@ export function ReportStep({ meta, onRestart }: ReportStepProps) {
         </div>
       </div>
 
-      {/* Options card */}
-      <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-foreground">다운로드 옵션</h3>
-        <div className="mt-4 flex flex-col gap-3">
-          <OptionRow
-            id="opt-violations"
-            checked={violationsOnly}
-            onChange={setViolationsOnly}
-            label="위반 문구만 포함 (요약 리포트)"
-          />
-          <OptionRow
-            id="opt-full"
-            checked={fullReport}
-            onChange={setFullReport}
-            label="전체 문구 포함 (전체 리포트)"
-          />
-          <OptionRow
-            id="opt-original"
-            checked={includeOriginal}
-            onChange={setIncludeOriginal}
-            label="원문 PDF 병기"
-          />
-        </div>
-      </div>
-
       {/* Footer */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4 shadow-sm">
         <Button variant="outline" onClick={onRestart} className="gap-2">
           <RefreshCw className="h-4 w-4" />새 심의 시작
         </Button>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
+          <Button
+            variant="outline"
+            className="gap-2"
+            disabled={!reviewId || !!loading}
+            onClick={() => handleDownload("summary")}
+          >
+            {loading === "summary" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             요약 리포트
           </Button>
-          <Button className="gap-2">
-            <Download className="h-4 w-4" />
+          <Button
+            variant="outline"
+            className="gap-2"
+            disabled={!reviewId || !!loading}
+            onClick={() => handleDownload("original_pdf")}
+          >
+            {loading === "original_pdf" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            원문 PDF
+          </Button>
+          <Button
+            className="gap-2"
+            disabled={!reviewId || !!loading}
+            onClick={() => handleDownload("full")}
+          >
+            {loading === "full" ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             전체 리포트 PDF
           </Button>
         </div>
       </div>
     </div>
-  );
-}
-
-function OptionRow({
-  id,
-  checked,
-  onChange,
-  label,
-}: {
-  id: string;
-  checked: boolean;
-  onChange: (v: boolean) => void;
-  label: string;
-}) {
-  return (
-    <label
-      htmlFor={id}
-      className="flex cursor-pointer items-center gap-3 rounded-lg border border-border bg-background px-4 py-3 text-sm text-foreground transition-colors hover:bg-muted/40"
-    >
-      <Checkbox
-        id={id}
-        checked={checked}
-        onCheckedChange={(v) => onChange(v === true)}
-      />
-      <Label htmlFor={id} className="cursor-pointer font-normal">
-        {label}
-      </Label>
-    </label>
   );
 }
