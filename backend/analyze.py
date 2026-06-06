@@ -1,13 +1,15 @@
+import asyncio
 import json
 import os
 import re
+import time
 import uuid
 from datetime import datetime
 
 from fastapi import APIRouter, File, Form, UploadFile
 
 from approve import save_record
-from llm import call_llm
+from llm import call_llm_async
 from pdf_parser import extract_text
 from prompts import COMPARE_SUMMARY_SYSTEM_PROMPT, COMPARE_SYSTEM_PROMPT, REVIEW_SYSTEM_PROMPT
 from schemas import ReviewRecord
@@ -95,27 +97,33 @@ def _grade_order(grade: str) -> int:
 SEVERITY_MAP = {"🔴 위반": "violation", "🟡 주의": "warning", "🟢 통과": "compliant"}
 
 
-# --- 준법 심의: 문구별 반복 호출 ---
+# --- 준법 심의: 문구별 병렬 호출 ---
 
-def _run_review(clauses: list[str], language: str, product_type: str) -> dict:
-    items = []
-    for i, clause in enumerate(clauses):
-        msg = _build_review_message(clause, i, clauses, language, product_type)
-        try:
-            raw = call_llm(REVIEW_SYSTEM_PROMPT, msg)
-            items.append(_parse_llm_json(raw))
-        except Exception as e:
-            # 파싱 실패 시 주의 등급으로 대체
-            items.append({
-                "index": i + 1,
-                "title": "분석 오류",
-                "grade": "🟡 주의",
-                "severity": "warning",
-                "violation_article": None,
-                "problem_expression": None,
-                "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
-                "suggestion": None,
-            })
+async def _run_review_async(clauses: list[str], language: str, product_type: str) -> dict:
+    sem = asyncio.Semaphore(5)
+    t0 = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
+
+    async def _one(i: int, clause: str) -> dict:
+        async with sem:
+            msg = _build_review_message(clause, i, clauses, language, product_type)
+            try:
+                raw = await call_llm_async(REVIEW_SYSTEM_PROMPT, msg, call_id=f"review-{i + 1}")
+                return _parse_llm_json(raw)
+            except Exception as e:
+                return {
+                    "index": i + 1,
+                    "title": "분석 오류",
+                    "grade": "🟡 주의",
+                    "severity": "warning",
+                    "violation_article": None,
+                    "problem_expression": None,
+                    "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
+                    "suggestion": None,
+                }
+
+    items = list(await asyncio.gather(*[_one(i, c) for i, c in enumerate(clauses)]))
+
+    print(f"[refactor] LLM 호출 레이턴시 체크 | review 페이즈 완료 {time.perf_counter() - t0:.2f}s ({len(clauses)}문구)")  # [refactor] LLM 호출 레이턴시 체크
 
     grades = [item["grade"] for item in items]
     overall_grade = min(grades, key=_grade_order) if grades else "🟢 통과"
@@ -131,31 +139,38 @@ def _run_review(clauses: list[str], language: str, product_type: str) -> dict:
     }
 
 
-# --- 뉘앙스 비교: 문구 쌍별 반복 호출 + 전체 요약 ---
+# --- 뉘앙스 비교: 문구 쌍별 병렬 호출 + 전체 요약 ---
 
-def _run_compare(ko_clauses: list[str], tr_clauses: list[str], language: str, product_type: str) -> dict:
+async def _run_compare_async(ko_clauses: list[str], tr_clauses: list[str], language: str, product_type: str) -> dict:
     count = min(len(ko_clauses), len(tr_clauses))
-    items = []
-    for i in range(count):
-        msg = _build_compare_message(ko_clauses[i], tr_clauses[i], i, ko_clauses, tr_clauses, language, product_type)
-        try:
-            raw = call_llm(COMPARE_SYSTEM_PROMPT, msg)
-            items.append(_parse_llm_json(raw))
-        except Exception as e:
-            items.append({
-                "index": i + 1,
-                "title": "분석 오류",
-                "has_nuance_change": False,
-                "grade": "🟡 주의",
-                "severity": "warning",
-                "violation_article": None,
-                "original": ko_clauses[i],
-                "translated": tr_clauses[i],
-                "original_expression": None,
-                "translated_expression": None,
-                "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
-                "suggestion": None,
-            })
+    sem = asyncio.Semaphore(5)
+    t0 = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
+
+    async def _one(i: int) -> dict:
+        async with sem:
+            msg = _build_compare_message(ko_clauses[i], tr_clauses[i], i, ko_clauses, tr_clauses, language, product_type)
+            try:
+                raw = await call_llm_async(COMPARE_SYSTEM_PROMPT, msg, call_id=f"compare-{i + 1}")
+                return _parse_llm_json(raw)
+            except Exception as e:
+                return {
+                    "index": i + 1,
+                    "title": "분석 오류",
+                    "has_nuance_change": False,
+                    "grade": "🟡 주의",
+                    "severity": "warning",
+                    "violation_article": None,
+                    "original": ko_clauses[i],
+                    "translated": tr_clauses[i],
+                    "original_expression": None,
+                    "translated_expression": None,
+                    "reason": f"LLM 응답 파싱 실패: {str(e)[:100]}",
+                    "suggestion": None,
+                }
+
+    items = list(await asyncio.gather(*[_one(i) for i in range(count)]))
+
+    print(f"[refactor] LLM 호출 레이턴시 체크 | compare 문구 병렬 완료 {time.perf_counter() - t0:.2f}s ({count}문구)")  # [refactor] LLM 호출 레이턴시 체크
 
     grades = [item["grade"] for item in items]
     overall_grade = min(grades, key=_grade_order) if grades else "🟢 통과"
@@ -175,7 +190,11 @@ def _run_compare(ko_clauses: list[str], tr_clauses: list[str], language: str, pr
         "compliant_count": compliant_count,
         "items": items,
     }, ensure_ascii=False)
-    summary_raw = call_llm(COMPARE_SUMMARY_SYSTEM_PROMPT, summary_input)
+
+    t_summary = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
+    summary_raw = await call_llm_async(COMPARE_SUMMARY_SYSTEM_PROMPT, summary_input, call_id="summary")
+    print(f"[refactor] LLM 호출 레이턴시 체크 | compare 요약 완료 {time.perf_counter() - t_summary:.2f}s")  # [refactor] LLM 호출 레이턴시 체크
+
     summary = _parse_llm_json(summary_raw)
 
     return {
@@ -209,17 +228,31 @@ async def analyze(
     original_pdf: UploadFile = File(..., description="한국어 원문 PDF"),
     translated_pdf: UploadFile = File(..., description="외국어 번역본 PDF"),
 ):
-    original_bytes = await original_pdf.read()
-    translated_bytes = await translated_pdf.read()
+    t_total = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
 
-    original_text = extract_text(original_bytes)
-    translated_text = extract_text(translated_bytes)
+    original_bytes, translated_bytes = await asyncio.gather(
+        original_pdf.read(),
+        translated_pdf.read(),
+    )
+
+    t0 = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
+    original_text, translated_text = await asyncio.gather(
+        asyncio.to_thread(extract_text, original_bytes),
+        asyncio.to_thread(extract_text, translated_bytes),
+    )
+    print(f"[refactor] LLM 호출 레이턴시 체크 | PDF 추출 완료 {time.perf_counter() - t0:.2f}s")  # [refactor] LLM 호출 레이턴시 체크
 
     ko_clauses = split_clauses(original_text)
     tr_clauses = split_clauses(translated_text)
+    print(f"[refactor] LLM 호출 레이턴시 체크 | 문구 수 — 원문: {len(ko_clauses)}, 번역: {len(tr_clauses)}")  # [refactor] LLM 호출 레이턴시 체크
 
-    review_result = _run_review(tr_clauses, language, product_type)
-    compare_result = _run_compare(ko_clauses, tr_clauses, language, product_type)
+    t0 = time.perf_counter()  # [refactor] LLM 호출 레이턴시 체크
+    review_result, compare_result = await asyncio.gather(
+        _run_review_async(tr_clauses, language, product_type),
+        _run_compare_async(ko_clauses, tr_clauses, language, product_type),
+    )
+    print(f"[refactor] LLM 호출 레이턴시 체크 | review+compare 병렬 완료 {time.perf_counter() - t0:.2f}s")  # [refactor] LLM 호출 레이턴시 체크
+    print(f"[refactor] LLM 호출 레이턴시 체크 | 전체 analyze 소요 {time.perf_counter() - t_total:.2f}s")  # [refactor] LLM 호출 레이턴시 체크
 
     record = ReviewRecord(
         id=str(uuid.uuid4()),
