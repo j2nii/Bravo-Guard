@@ -107,19 +107,6 @@ export function ReportStep({ meta, reviewId, onRestart }: ReportStepProps) {
             요약 리포트
           </Button>
           <Button
-            variant="outline"
-            className="gap-2"
-            disabled={!reviewId || !!loading}
-            onClick={() => handleDownload("original_pdf")}
-          >
-            {loading === "original_pdf" ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
-            원문 PDF
-          </Button>
-          <Button
             className="gap-2"
             disabled={!reviewId || !!loading}
             onClick={() => handleDownload("full")}

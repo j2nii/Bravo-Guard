@@ -22,12 +22,12 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "금융 준법 심의 시스템" },
+      { title: "Bravo-Guard: 금융 준법 심의 시스템" },
       {
         name: "description",
         content: "금융 광고 한국어 원문과 외국어 번역본을 AI로 대조 분석하는 준법 심의 시스템",
       },
-      { property: "og:title", content: "금융 준법 심의 시스템" },
+      { property: "og:title", content: "Bravo-Guard: 금융 준법 심의 시스템" },
       {
         property: "og:description",
         content: "AI 기반 다국어 금융 광고 준법 심의 및 승인 관리 플랫폼",
@@ -107,7 +107,7 @@ function Index() {
               <ShieldCheck className="h-5 w-5" />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-base font-semibold text-foreground">금융 준법 심의 시스템</span>
+              <span className="text-base font-semibold text-foreground">Bravo-Guard: 금융 준법 심의 시스템</span>
               <span className="text-xs text-muted-foreground">Compliance Review Platform</span>
             </div>
           </div>
@@ -160,7 +160,7 @@ function Index() {
                     id="productName"
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
-                    placeholder="예: 신한 우대 적금 상품 광고"
+                    placeholder="예: JB 금융 우대 적금 상품 광고"
                   />
                 </div>
 
