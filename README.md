@@ -39,8 +39,8 @@ docker-compose up --build
 | FE | BE | BE | BE | 서비스 기획 |
 | [GitHub](https://github.com/jwlee0348) | [GitHub](https://github.com/j2nii)| [GitHub](https://github.com/yummsseo) | [GitHub](https://github.com/alskso) | [GitHub](https://github.com/정유진_깃허브_아이디) |
 
-
-# 3. Key Features (핵심 기능 명세)
+<br/>
+<br/>
 
 # 3. Key Features (주요 기능)
 
