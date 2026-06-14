@@ -4,6 +4,10 @@
 ### dotenv ###
 .env
 
+### 프로젝트 ###
+backend/data/reviews.json
+backend/data/pdfs/*.pdf
+
 ### Git ###
 # Created by git for backups. To disable backups in Git:
 # $ git config --global mergetool.keepBackup false
@@ -76,10 +80,12 @@ sketch
 [Ii]nclude
 [Ll]ib
 [Ll]ib64
+!frontend/src/lib/
 [Ll]ocal
 [Ss]cripts
 pyvenv.cfg
 .venv
+venv
 pip-selfcheck.json
 
 ### VisualStudioCode ###
@@ -126,5 +132,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+__pycache__/
+*.pyc
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,windows,macos,venv,git,dotenv,react
