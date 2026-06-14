@@ -1,3 +1,11 @@
+---
+name: 이슈 템플릿
+about: 새로운 기능 추가 또는 수정
+title: ""
+labels: ""
+assignees: ""
+---
+
 ## 📝 작업 개요
 - 작업개요
 
