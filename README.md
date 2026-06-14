@@ -35,9 +35,9 @@ docker-compose up --build
 
 | 이지원 | 김지은 | 신윤서 | 한연주 | 정유진 | 
 |:------:|:------:|:------:|:------:|:------:|
-| <img src="https://github.com/jwlee0348.png" alt="이지원" width="150"> | <img src="https://github.com/j2nii.png" alt="김지은" width="150">| <img src="https://github.com/yummsseo.png" alt="신윤서" width="150"> | <img src="https://github.com/alskso.png" alt="한연주" width="150"> | <img src="https://github.com/정유진_깃허브_아이디.png" alt="정유진" width="150"> |
+| <img src="https://github.com/jwlee0348.png" alt="이지원" width="150"> | <img src="https://github.com/j2nii.png" alt="김지은" width="150">| <img src="https://github.com/yummsseo.png" alt="신윤서" width="150"> | <img src="https://github.com/alskso.png" alt="한연주" width="150"> | <img src="https://github.com/newjinini.png" alt="정유진" width="150"> |
 | FE | BE | BE | BE | 서비스 기획 |
-| [GitHub](https://github.com/jwlee0348) | [GitHub](https://github.com/j2nii)| [GitHub](https://github.com/yummsseo) | [GitHub](https://github.com/alskso) | [GitHub](https://github.com/정유진_깃허브_아이디) |
+| [GitHub](https://github.com/jwlee0348) | [GitHub](https://github.com/j2nii)| [GitHub](https://github.com/yummsseo) | [GitHub](https://github.com/alskso) | [GitHub](https://github.com/newjinini) |
 
 <br/>
 <br/>
@@ -65,7 +65,7 @@ docker-compose up --build
 | **김지은** (BE) | <img src="https://github.com/j2nii.png" alt="김지은" width="100"> |<ul><li>**데이터/통합 담당**</li><li>금소법 핵심 조항 텍스트 정리 (19조, 22조 등)</li><li>AI 프롬프트에 조항 데이터 공급</li><li>테스트용 샘플 콘텐츠 준비 (베트남어 대출 광고 예시 등)</li><li>전체 기능 통합 테스트</li><li>버그 리포트 + 수정 지원</li></ul> |
 | **신윤서** (BE) | <img src="https://github.com/yummsseo.png" alt="신윤서" width="100"> | <ul><li>**AI/프롬프트 담당**</li><li>Claude/GPT API 연결</li><li>기능 1 프롬프트 설계 (다국어 준법 심의)</li><li>기능 2 프롬프트 설계 (원문 vs 번역본 비교)</li><li>언어별 테스트 (베트남어, 중국어, 영어 등)</li><li>프롬프트 고도화 (결과 품질 개선)</li></ul> |
 | **한연주** (BE) | <img src="https://github.com/alskso.png" alt="한연주" width="100"> | <ul><li>**API 서버 담당**</li><li>FastAPI 서버 세팅</li><li>엔드포인트 3개 개발 (<code>POST /api/review</code>, <code>POST /api/compare</code>, <code>POST /api/approve</code>)</li><li>AI 프롬프트 로직 연결</li><li>심의 이력 저장 (JSON or SQLite)</li><li>프론트엔드 연동</li></ul> |
-| **정유진** (서비스 기획) |  <img src="https://github.com/정유진_깃허브_아이디.png" alt="정유진" width="100"> | <ul><li>**서비스 기획 및 총괄**</li><li>전반적인 서비스 의도 정의 및 요구사항 도출</li><li>서비스 시나리오 및 핵심 플로우 설계</li></ul> |
+| **정유진** (서비스 기획) |  <img src="https://github.com/newjinini.png" alt="정유진" width="100"> | <ul><li>**서비스 기획 및 총괄**</li><li>전반적인 서비스 의도 정의 및 요구사항 도출</li><li>서비스 시나리오 및 핵심 플로우 설계</li></ul> |
 
 <br/>
 <br/>
